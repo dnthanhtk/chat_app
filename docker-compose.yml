@@ -1,0 +1,43 @@
+version: "3.9"
+
+
+services:
+    db:
+        container_name: postgres_db
+        image: postgres
+        volumes:
+            - ./server/db:/app/db/postgresql/data
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+    backend:
+        container_name: backend_flask
+        build: 
+            dockerfile: Dockerfile
+            context: ./server
+        hostname: flask
+        restart: always
+        command: ["python","app.py"]
+        volumes:
+            - ./server:/app/server
+        
+        ports:
+            - "9999:9999"
+        depends_on:
+            - db
+    frontend:
+        container_name: prontend_node
+        build: 
+            dockerfile: Dockerfile
+            context: ./frontend
+        #restart: always
+        
+        volumes:
+            - ./frontend:/app/frontend
+            - ./frontend/node_modules:/app/frontend/node_modules
+        ports:
+            - "3000:3000"
+        command: ["npm", "start"]
+   
+    
